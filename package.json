@@ -4,11 +4,18 @@
   "description": "API to register, show and other things about Star Wars",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "roqueando",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^7.5.0"
+    "eslint": "^7.5.0",
+    "husky": "^4.2.5",
+    "jest": "^26.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": ""
+    }
   }
 }

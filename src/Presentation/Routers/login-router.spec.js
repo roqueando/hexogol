@@ -1,12 +1,14 @@
 const LoginRouter = require('./LoginRouter');
 const MissingParameterError = require('../Concerns/Exceptions/MissingParameterError');
 const UnauthorizedError = require('../Concerns/Exceptions/UnauthorizedException');
+const InternalException = require('../Concerns/Exceptions/InternalException');
 
 const makeSUT = () => {
   class AuthUseCaseSpy {
     auth(email, password) {
       this.email = email;
       this.password = password;
+      return this.token;
     }
   }
   const authUseCaseSpy = new AuthUseCaseSpy();
@@ -39,13 +41,15 @@ describe('login router', () => {
   });
   test('should return 500 if no httpRequest object is provided', () => {
     const { sut } = makeSUT();
-    const httpResponse = sut.route();
-    expect(httpResponse.statusCode).toBe(500);
+    const { statusCode, body } = sut.route();
+    expect(statusCode).toBe(500);
+    expect(body).toEqual(new InternalException);
   });
   test('should return 500 if httpRequest object has no body', () => {
     const { sut } = makeSUT();
-    const httpResponse = sut.route({});
-    expect(httpResponse.statusCode).toBe(500);
+    const { statusCode, body } = sut.route({});
+    expect(statusCode).toBe(500);
+    expect(body).toEqual(new InternalException);
   });
   test('should call AuthUseCase with correct credentials', () => {
     const { sut, authUseCaseSpy } = makeSUT();
@@ -59,10 +63,9 @@ describe('login router', () => {
     expect(authUseCaseSpy.email).toBe(httpRequest.body.email);
     expect(authUseCaseSpy.password).toBe(httpRequest.body.password);
   });
-
-
   test('should return 401 when invalid credentials', () => {
-    const { sut } = makeSUT();
+    const { sut, authUseCaseSpy } = makeSUT();
+    authUseCaseSpy.token = null;
     const httpRequest = {
       body: {
         email: 'invalid_email@gmail.com',
@@ -73,6 +76,19 @@ describe('login router', () => {
     expect(statusCode).toBe(401);
     expect(body).toEqual(new UnauthorizedError);
   });
+  test('should return 200 when valid credentials', () => {
+    const { sut, authUseCaseSpy } = makeSUT();
+    authUseCaseSpy.token = 'TOKEN';
+    const httpRequest = {
+      body: {
+        email: 'valid_email@gmail.com',
+        password: 'valid'
+      }
+    }
+    const { statusCode, body } = sut.route(httpRequest);
+    expect(statusCode).toBe(200);
+    expect(body.token).toEqual(authUseCaseSpy.token)
+  });
   test('should return 500 if no AuthUseCase has provided ', () => {
     const sut = new LoginRouter();
     const httpRequest = {
@@ -81,8 +97,9 @@ describe('login router', () => {
         password: 'any'
       }
     }
-    const { statusCode } = sut.route(httpRequest);
+    const { statusCode, body } = sut.route(httpRequest);
     expect(statusCode).toBe(500);
+    expect(body).toEqual(new InternalException);
   });
   test('should return 500 if AuthUseCase has no auth method  ', () => {
     const sut = new LoginRouter({});
@@ -92,7 +109,9 @@ describe('login router', () => {
         password: 'any'
       }
     }
-    const { statusCode } = sut.route(httpRequest);
+    const { statusCode, body } = sut.route(httpRequest);
     expect(statusCode).toBe(500);
+    expect(body).toEqual(new InternalException);
   });
+
 });

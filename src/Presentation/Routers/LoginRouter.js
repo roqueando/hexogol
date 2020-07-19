@@ -4,23 +4,23 @@ class LoginRouter {
     this.authUseCase = authUseCase;
   }
   route(httpRequest) {
-    if (!httpRequest
-      || !httpRequest.body
-      || !this.authUseCase
-      || !this.authUseCase.auth
-    ) {
+    try {
+      const { email, password } = httpRequest.body;
+      if (!email) {
+        return HttpResponse.badRequest('email');
+      }
+      if (!password) {
+        return HttpResponse.badRequest('password');
+      }
+
+      const token = this.authUseCase.auth(email, password);
+      if (!token) {
+        return HttpResponse.unauthorized();
+      }
+      return HttpResponse.success({ token })
+    } catch (error) {
       return HttpResponse.internalError();
     }
-    const { email, password } = httpRequest.body;
-    if (!email) {
-      return HttpResponse.badRequest('email');
-    }
-    if (!password) {
-      return HttpResponse.badRequest('password');
-    }
-
-    this.authUseCase.auth(email, password);
-    return HttpResponse.unauthorized();
   }
 }
 

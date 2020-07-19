@@ -15,7 +15,10 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": ""
+      "pre-commit": "npm test"
     }
+  },
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }

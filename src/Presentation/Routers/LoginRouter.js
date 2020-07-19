@@ -3,7 +3,7 @@ class LoginRouter {
   constructor(authUseCase) {
     this.authUseCase = authUseCase;
   }
-  route(httpRequest) {
+  async route(httpRequest) {
     try {
       const { email, password } = httpRequest.body;
       if (!email) {
@@ -13,7 +13,7 @@ class LoginRouter {
         return HttpResponse.badRequest('password');
       }
 
-      const token = this.authUseCase.auth(email, password);
+      const token = await this.authUseCase.auth(email, password);
       if (!token) {
         return HttpResponse.unauthorized();
       }

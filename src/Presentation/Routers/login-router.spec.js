@@ -73,4 +73,26 @@ describe('login router', () => {
     expect(statusCode).toBe(401);
     expect(body).toEqual(new UnauthorizedError);
   });
+  test('should return 500 if no AuthUseCase has provided ', () => {
+    const sut = new LoginRouter();
+    const httpRequest = {
+      body: {
+        email: 'any@email.com',
+        password: 'any'
+      }
+    }
+    const { statusCode } = sut.route(httpRequest);
+    expect(statusCode).toBe(500);
+  });
+  test('should return 500 if AuthUseCase has no auth method  ', () => {
+    const sut = new LoginRouter({});
+    const httpRequest = {
+      body: {
+        email: 'any@email.com',
+        password: 'any'
+      }
+    }
+    const { statusCode } = sut.route(httpRequest);
+    expect(statusCode).toBe(500);
+  });
 });

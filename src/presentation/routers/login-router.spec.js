@@ -1,11 +1,11 @@
 class LoginRouter {
   route(httpRequest) {
-    if (!httpRequest.body.email || !httpRequest.body.password) {
+    const { email, password } = httpRequest.body;
+    if (!email || !password) {
       return {
         statusCode: 400
       }
     }
-
   }
 }
 describe('login router', () => {
@@ -29,6 +29,5 @@ describe('login router', () => {
     }
     const httpResponse = sut.route(httpRequest);
     expect(httpResponse.statusCode).toBe(400);
-
   });
 });

@@ -17,6 +17,18 @@ const makeSUT = () => {
     authUseCaseSpy
   }
 }
+
+const makeEmailValidator = () => {
+  class EmailValidatorSpy {
+    isValid(email) {
+      this.email = email;
+      return this.isEmailValid;
+    }
+  }
+  const emailValidatorSpy = new EmailValidatorSpy();
+  emailValidatorSpy.isEmailValid = true;
+  return emailValidatorSpy;
+}
 describe('login router', () => {
   test('should return 400 if no email provided', async () => {
     const { sut } = makeSUT();
@@ -114,4 +126,7 @@ describe('login router', () => {
     expect(body).toEqual(new InternalException);
   });
 
+  test('should return 400 if email is invalid', async () => {
+
+  })
 });

@@ -1,11 +1,12 @@
 const MissingParameterError = require('./Exceptions/MissingParameterError');
 const UnauthorizedException = require('./Exceptions/UnauthorizedException');
 const InternalException = require('./Exceptions/InternalException');
+const InvalidParameterException = require('./Exceptions/InvalidParameterException');
 class HttpResponse {
-  static badRequest(param) {
+  static badRequest(error) {
     return {
       statusCode: 400,
-      body: new MissingParameterError(param)
+      body: error
     }
   }
 
